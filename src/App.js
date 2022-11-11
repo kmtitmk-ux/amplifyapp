@@ -5,6 +5,7 @@ import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { listNotes } from './graphql/queries';
 import { createNote as createNoteMutation, deleteNote as deleteNoteMutation } from './graphql/mutations';
 import { I18n } from 'aws-amplify';
+import dayjs from 'dayjs';
 const dict = {
     'ja': {
         'Sign in to your account': 'アカウントにサインインする',
@@ -65,7 +66,9 @@ function App() {
         setNotes(apiData.data.listNotes.items);
     }
 
-    async function createNote() {
+    async function createNote(e) {
+        e.preventDefault();
+        
         if (!formData.name || !formData.description) return;
         await API.graphql({ query: createNoteMutation, variables: { input: formData } });
         setNotes([...notes, formData]);
@@ -80,17 +83,21 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <input
-                    onChange={e => setFormData({ ...formData, 'name': e.target.value })}
-                    placeholder="Note name"
-                    value={formData.name}
-                />
-                <input
-                    onChange={e => setFormData({ ...formData, 'description': e.target.value })}
-                    placeholder="Note description"
-                    value={formData.description}
-                />
-                <button onClick={createNote}>Create Note</button>
+                <form onSubmit={createNote}>
+                    <input
+                        name="name"
+                        onChange={e => setFormData({ ...formData, 'name': e.target.value })}
+                        placeholder="Note name"
+                        value={formData.name}
+                    />
+                    <input
+                        name="description"
+                        onChange={e => setFormData({ ...formData, 'description': e.target.value })}
+                        placeholder="Note description"
+                        value={formData.description}
+                    />
+                    <button type="submit">Create Note</button>
+                </form>
                 <div style={{ marginBottom: 30 }}>
                     {
                         notes.map(note => (
@@ -108,5 +115,5 @@ function App() {
     );
 }
 
-export default withAuthenticator(App);
-// export default App;
+// export default withAuthenticator(App);
+export default App;
